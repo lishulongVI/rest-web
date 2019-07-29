@@ -1,9 +1,10 @@
 from django.http import HttpResponse, JsonResponse
 from rest_framework import viewsets, mixins
 from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import User, Student, LearnGroup
+from .models import User, Student, LearnGroup, Course, PricePolicy, DegreeCourse
 from .permissions import IsUserOrReadOnly
 from .serializers import CreateUserSerializer, UserSerializer
 from django.views import View
@@ -169,7 +170,6 @@ class StudentSerializer(serializers.ModelSerializer):
 
 
 class StudentView(APIView):
-
     def get(self, request, *args, **kwargs):
         data = StudentSerializer(instance=Student.objects.all(), many=True,
                                  context={'request': request}).data
@@ -183,7 +183,6 @@ class LearnGroupSerializer(serializers.ModelSerializer):
 
 
 class TitleValidator:
-
     def __init__(self, v):
         self.value = v
 
@@ -224,3 +223,43 @@ class LearnGroupView(APIView):
         else:
             print(s.errors)
             return JsonResponse(data=s.errors)
+
+
+from rest_framework.serializers import ModelSerializer
+
+
+class MMModelSerializer(ModelSerializer):
+    class Meta:
+        model = PricePolicy
+        fields = '__all__'
+        depth = 1
+
+
+class CourseView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Course.objects.all()
+
+    serializer_class = MMModelSerializer
+
+    def list(self, request, *args, **kwargs):
+        Course.objects.create(**{
+            'title': "math¬"
+        })
+        DegreeCourse.objects.create(**{
+            'title': "语文"
+        })
+
+        c = Course.objects.filter().first()
+        d = DegreeCourse.objects.all().first()
+        PricePolicy.objects.create(price=1.2, periods=1, content_object=c)
+        PricePolicy.objects.create(price=1.3, periods=2, content_object=c)
+        PricePolicy.objects.create(price=1.4, periods=3, content_object=c)
+        PricePolicy.objects.create(price=11.4, periods=13, content_object=d)
+        PricePolicy.objects.create(price=12.4, periods=23, content_object=d)
+        PricePolicy.objects.create(price=13.4, periods=33, content_object=d)
+
+        pps = c.policy_list.all()
+
+        s = MMModelSerializer(instance=pps, many=True)
+
+        print(pps)
+        return Response(s.data)

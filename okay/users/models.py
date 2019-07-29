@@ -1,4 +1,7 @@
 import uuid
+
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
@@ -59,3 +62,22 @@ class Student(models.Model):
     class Meta:
         verbose_name = "学生"
         verbose_name_plural = "学生管理"
+
+
+class Course(models.Model):
+    title = models.CharField(max_length=12)
+
+    policy_list = GenericRelation("PricePolicy")
+
+
+class DegreeCourse(models.Model):
+    title = models.CharField(max_length=12)
+
+
+class PricePolicy(models.Model):
+    price = models.IntegerField()
+    periods = models.IntegerField()
+
+    content_type = models.ForeignKey(ContentType, verbose_name='表名', on_delete=True)
+    object_id = models.IntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
