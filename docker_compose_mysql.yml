@@ -1,0 +1,24 @@
+version: "3.0"
+
+services:
+  mysql_2019:
+    image: mysql:5.7
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=rest
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=123456
+    volumes:
+      - ./mysql/data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d/
+      - ./mysql/conf/my.cnf:/etc/my.cnf
+    networks:
+      - admin
+    ports:
+      - "3307:3306"
+    restart: always
+
+
+networks:
+  admin:
