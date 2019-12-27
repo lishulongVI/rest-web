@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
-    'server',
+    'web_admin',
+    'rest_framework',
+    'django_filters',
+
 ]
 
 MIDDLEWARE = [
@@ -72,6 +75,13 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'rest.wsgi.application'
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+}
+APPEND_SLASH = False
 
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -109,10 +119,10 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'UTC'
-# TIME_ZONE = 'Asia/Shanghai'
+# TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
